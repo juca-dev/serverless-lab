@@ -2,6 +2,7 @@ import "dotenv/config";
 import { App, StackProps } from "aws-cdk-lib";
 import { join } from "path";
 import { getSubfolders } from "./util";
+import { LambdaStack } from "./lambda";
 
 const { version: APP_VERSION } = require("../../package.json");
 const { AWS_ACCOUNT, AWS_REGION, APP, STAGE } = process.env;
@@ -33,6 +34,14 @@ async function main() {
   const apiSrc = join(SRC_ROOT, "api");
   for (const api of getSubfolders(apiSrc)) {
     console.log("CDK:API", { api });
+    const lambda = new LambdaStack({
+      scope,
+      props,
+      id: `${APP}-api`,
+      source: join(apiSrc, api),
+      alias: STAGE,
+      version: APP_VERSION,
+    });
   }
 }
 
