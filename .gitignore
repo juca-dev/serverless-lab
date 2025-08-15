@@ -3,3 +3,4 @@ node_modules
 cdk
 dist
 tsconfig.tsbuildinfo
+cdk.out
