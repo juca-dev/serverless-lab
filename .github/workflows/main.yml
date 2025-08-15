@@ -1,0 +1,74 @@
+name: CI (PRD)
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "test/**"
+      - "README.md"
+
+env:
+  # AWS
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT }}
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  # APP
+  APP: slab
+  STAGE: prd
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
+
+      - name: Get npm cache directory path
+        id: npm-cache-dir-path
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+
+      - uses: actions/cache@v3
+        name: Cache node_modules
+        id: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-nodemodules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nodemodules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install CDK
+        run: npm install -g aws-cdk@2.1025.0
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true' ||
+          steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: CDK Bootstrap
+        run: cdk bootstrap
+
+      - name: CDK Test
+        run: cdk synth '*'
+
+      - name: CDK Deploy
+        run: cdk deploy '*' --require-approval never
