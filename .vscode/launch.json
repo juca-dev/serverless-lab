@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node-terminal",
+      "name": "api",
+      "request": "launch",
+      "command": "node --import tsx test/api.ts",
+      "cwd": "${workspaceRoot}"
+    }
+  ]
+}
