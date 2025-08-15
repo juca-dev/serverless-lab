@@ -6,6 +6,7 @@
     "url": "git+https://github.com/juca-dev/serverless-lab.git"
   },
   "scripts": {
+    "build": "tsc --build",
     "dev": "tsx watch test/api.ts"
   },
   "author": "Juca Developer",
@@ -17,8 +18,12 @@
   "homepage": "https://github.com/juca-dev/serverless-lab#readme",
   "devDependencies": {
     "@types/node": "^24.3.0",
+    "dotenv": "^17.2.1",
     "fastify": "^5.5.0",
     "tsx": "^4.20.4",
     "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.211.0"
   }
 }
