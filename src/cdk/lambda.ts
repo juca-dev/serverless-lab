@@ -38,7 +38,7 @@ export class LambdaStack extends Stack {
       .filter(
         (e) =>
           lstatSync(join(source, e)).isDirectory() &&
-          lstatSync(join(source, e, "index.js")).isFile()
+          lstatSync(join(source, e, "index.ts")).isFile()
       )
       .forEach((filePath) => {
         this.build(filePath);
