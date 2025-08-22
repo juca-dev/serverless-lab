@@ -1,6 +1,6 @@
 export const handler = async (ev: any) => {
   const data = {
-    text: `Hello from /test/index GET!`,
+    text: `Hello from /test/index GET! (New Version)`,
   };
 
   const res = {

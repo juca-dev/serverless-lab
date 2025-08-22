@@ -1,4 +1,4 @@
-name: CI (PRD)
+name: CI (DEV)
 
 on:
   push:
