@@ -1,5 +1,6 @@
 import fastify from "fastify";
 import { handler as ApiHealthGET } from "../src/api/health/index-get";
+import { handler as ApiTesthGET } from "../src/api/test/index-get";
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 
@@ -26,6 +27,11 @@ app.addHook("preHandler", (req, res, next) => {
 // ### ROUTES
 app.get("/health", async (req, res) => {
   const data = await ApiHealthGET(req);
+  const { statusCode, body } = data;
+  res.status(statusCode).send(body);
+});
+app.get("/test", async (req, res) => {
+  const data = await ApiTesthGET(req);
   const { statusCode, body } = data;
   res.status(statusCode).send(body);
 });

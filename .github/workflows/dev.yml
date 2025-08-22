@@ -2,7 +2,7 @@ name: CI (PRD)
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
     paths-ignore:
       - "docs/**"
       - "test/**"
@@ -13,10 +13,10 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT }}
-  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_REGION: us-east-2
   # APP
   APP: slab
-  STAGE: live
+  STAGE: dev
 
 jobs:
   build:

@@ -7,7 +7,7 @@ import { LambdaStack } from "./lambda";
 const { version: APP_VERSION } = require("../../package.json");
 const { AWS_ACCOUNT, AWS_REGION, APP, STAGE } = process.env;
 
-const SRC_ROOT = join(__dirname, "../");
+const SRC_ROOT = join(__dirname, "../..", "dist");
 
 async function main() {
   console.log("### CDK:init", {
@@ -34,12 +34,10 @@ async function main() {
   const apiSrc = join(SRC_ROOT, "api");
   for (const context of getSubfolders(apiSrc)) {
     console.log("CDK:API", { context });
-    const lambda = new LambdaStack({
-      scope,
-      props,
-      id: `${APP}-api-${context}`,
+    const lambda = new LambdaStack(scope, `${APP}-api-${context}`, {
+      ...props,
       source: join(apiSrc, context),
-      alias: STAGE,
+      stage: STAGE,
       version: APP_VERSION,
     });
   }

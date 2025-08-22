@@ -14,12 +14,9 @@ import {
 } from "aws-cdk-lib/aws-lambda";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 
-interface IProps {
-  scope: Construct;
-  id: string;
-  props?: StackProps;
+interface Props extends StackProps {
   source: string;
-  alias?: string;
+  stage: string;
   version?: string;
 }
 
@@ -27,20 +24,14 @@ export class LambdaStack extends Stack {
   private readonly id: string;
   private readonly source: string;
   private readonly version: string;
-  private readonly alias: string;
-  constructor({
-    scope,
-    id,
-    props,
-    source,
-    version = "0.0.0",
-    alias = "dev",
-  }: IProps) {
+  private readonly stage: string;
+  constructor(scope, id, props: Props) {
     super(scope, `${id}-lambda`, props);
     this.id = id;
+    const { source, stage, version = "0.0.0" } = props;
     this.source = source;
     this.version = version;
-    this.alias = alias;
+    this.stage = stage;
 
     readdirSync(source)
       .filter(
@@ -105,8 +96,8 @@ export class LambdaStack extends Stack {
     );
 
     const version = fn.currentVersion;
-    const alias = new Alias(this, `${name}-${this.alias}-alias`, {
-      aliasName: this.alias,
+    const alias = new Alias(this, `${name}-${this.stage}-alias`, {
+      aliasName: this.stage,
       version,
     });
 
@@ -121,7 +112,7 @@ export class LambdaStack extends Stack {
       },
     });
 
-    new CfnOutput(this, `${name}-${this.alias}-url`, {
+    new CfnOutput(this, `${name}-${this.stage}-url`, {
       value: publicUrl.url,
     });
   }
