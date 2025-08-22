@@ -1,4 +1,5 @@
 # Serverless Lab
+
 From code to cloud, faster.
 
 ## Objective
@@ -14,8 +15,9 @@ Our goal is to create a complete **serverless application** step by step, using 
 
 ## Steps
 
-- [Step 01 – Project Setup](docs/step/01.md)
-- Step 02 – (coming soon)
+- [Step 01 – Serverless Setup](docs/step/01/README.md)
+- [Step 02 – Serverless Foundations](docs/step/02/README.md)
+- Step 03 – (coming soon)
 
 ## Contributing
 

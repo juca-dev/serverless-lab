@@ -1,5 +1,4 @@
-import { CfnOutput, RemovalPolicy, Stack, StackProps } from "aws-cdk-lib";
-import { Construct } from "constructs";
+import { RemovalPolicy, Stack, StackProps } from "aws-cdk-lib";
 import { lstatSync, readdirSync } from "fs";
 import { join } from "path";
 import { getDirectoryHash } from "./util";
@@ -8,18 +7,14 @@ import {
   Architecture,
   AssetCode,
   Function,
-  FunctionUrlAuthType,
-  HttpMethod,
   Runtime,
 } from "aws-cdk-lib/aws-lambda";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { Construct } from "constructs";
 
-interface IProps {
-  scope: Construct;
-  id: string;
-  props?: StackProps;
+interface Props extends StackProps {
   source: string;
-  alias?: string;
+  stage: string;
   version?: string;
 }
 
@@ -27,20 +22,14 @@ export class LambdaStack extends Stack {
   private readonly id: string;
   private readonly source: string;
   private readonly version: string;
-  private readonly alias: string;
-  constructor({
-    scope,
-    id,
-    props,
-    source,
-    version = "0.0.0",
-    alias = "dev",
-  }: IProps) {
+  private readonly stage: string;
+  constructor(scope: Construct, id: string, props: Props) {
     super(scope, `${id}-lambda`, props);
     this.id = id;
+    const { source, stage, version = "0.0.0" } = props;
     this.source = source;
     this.version = version;
-    this.alias = alias;
+    this.stage = stage;
 
     readdirSync(source)
       .filter(
@@ -53,27 +42,9 @@ export class LambdaStack extends Stack {
       });
   }
 
-  private formatName(id: string) {
-    let res = id
-      .replace(/\//g, "-")
-      .split("-")
-      .filter((e) => e)
-      .join("-"); //remove from start/end
-
-    const params = res.match(/\{([0-9a-z]+)\}/gi); //ex user-{id}-name
-    if (params) {
-      //ex user-{id}-name => user-ID-name
-      for (let param of params) {
-        res = res.replace(param, param.replace(/[\{\}]/g, "").toUpperCase());
-      }
-    }
-
-    return res;
-  }
-
   private build(filePath: string) {
     const source = join(this.source, filePath);
-    const name = this.formatName(filePath);
+    const name = formatName(filePath);
     console.log("lambda:build", { name, source });
     const description = `v${this.version} (${getDirectoryHash(source)})`;
 
@@ -105,24 +76,39 @@ export class LambdaStack extends Stack {
     );
 
     const version = fn.currentVersion;
-    const alias = new Alias(this, `${name}-${this.alias}-alias`, {
-      aliasName: this.alias,
+    const alias = new Alias(this, `${name}-${this.stage}-alias`, {
+      aliasName: this.stage,
       version,
     });
-
-    // PUBLIC URL (no auth)
-    // TODO: remove it, change to ApiGW
-    const publicUrl = alias.addFunctionUrl({
-      authType: FunctionUrlAuthType.NONE,
-      cors: {
-        allowedOrigins: ["*"],
-        allowedMethods: [HttpMethod.GET],
-        allowedHeaders: ["*"],
-      },
-    });
-
-    new CfnOutput(this, `${name}-${this.alias}-url`, {
-      value: publicUrl.url,
-    });
   }
+}
+
+function formatName(id: string) {
+  let res = id
+    .replace(/\//g, "-")
+    .split("-")
+    .filter((e) => e)
+    .join("-"); //remove from start/end
+
+  const params = res.match(/\{([0-9a-z]+)\}/gi); //ex user-{id}-name
+  if (params) {
+    //ex user-{id}-name => user-ID-name
+    for (let param of params) {
+      res = res.replace(param, param.replace(/[\{\}]/g, "").toUpperCase());
+    }
+  }
+
+  return res;
+}
+
+export function getFunctionByAlias(stack: Stack, id: string, alias?: string) {
+  const name = formatName(id);
+  const res = Function.fromFunctionArn(
+    stack,
+    `fnArn-${name}`, // , `${stack.stackId}-fnArn-${name}`
+    `arn:aws:lambda:${stack.region}:${stack.account}:function:${name}${
+      alias ? `:${alias}` : ""
+    }`
+  );
+  return res;
 }

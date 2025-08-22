@@ -1,4 +1,4 @@
-# Serverless Lab | Step 01
+# Step 01 - Serverless Setup
 
 Repository to learn and evolve by creating **TypeScript + Serverless applications** with **AWS CDK** and **GitHub Actions CI/CD**.
 

@@ -3,11 +3,12 @@ import { App, StackProps } from "aws-cdk-lib";
 import { join } from "path";
 import { getSubfolders } from "./util";
 import { LambdaStack } from "./lambda";
+import { ApiStack } from "./api";
 
 const { version: APP_VERSION } = require("../../package.json");
 const { AWS_ACCOUNT, AWS_REGION, APP, STAGE } = process.env;
 
-const SRC_ROOT = join(__dirname, "../");
+const SRC_ROOT = join(__dirname, "../..", "dist");
 
 async function main() {
   console.log("### CDK:init", {
@@ -32,16 +33,21 @@ async function main() {
   };
 
   const apiSrc = join(SRC_ROOT, "api");
-  for (const api of getSubfolders(apiSrc)) {
-    console.log("CDK:API", { api });
-    const lambda = new LambdaStack({
-      scope,
-      props,
-      id: `${APP}-api`,
-      source: join(apiSrc, api),
-      alias: STAGE,
+  for (const context of getSubfolders(apiSrc)) {
+    console.log("CDK:API", { context });
+    const lambda = new LambdaStack(scope, `${APP}-api-${context}`, {
+      ...props,
+      source: join(apiSrc, context),
+      stage: STAGE,
       version: APP_VERSION,
     });
+
+    const api = new ApiStack(scope, `${APP}-api-${context}`, {
+      ...props,
+      source: join(apiSrc, context),
+      stage: STAGE,
+    });
+    api.addDependency(lambda);
   }
 }
 
