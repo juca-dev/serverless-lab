@@ -1,5 +1,4 @@
-import { CfnOutput, RemovalPolicy, Stack, StackProps } from "aws-cdk-lib";
-import { Construct } from "constructs";
+import { RemovalPolicy, Stack, StackProps } from "aws-cdk-lib";
 import { lstatSync, readdirSync } from "fs";
 import { join } from "path";
 import { getDirectoryHash } from "./util";
@@ -8,11 +7,10 @@ import {
   Architecture,
   AssetCode,
   Function,
-  FunctionUrlAuthType,
-  HttpMethod,
   Runtime,
 } from "aws-cdk-lib/aws-lambda";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { Construct } from "constructs";
 
 interface Props extends StackProps {
   source: string;
@@ -25,7 +23,7 @@ export class LambdaStack extends Stack {
   private readonly source: string;
   private readonly version: string;
   private readonly stage: string;
-  constructor(scope, id, props: Props) {
+  constructor(scope: Construct, id: string, props: Props) {
     super(scope, `${id}-lambda`, props);
     this.id = id;
     const { source, stage, version = "0.0.0" } = props;
