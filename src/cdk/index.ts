@@ -34,10 +34,8 @@ async function main() {
   const apiSrc = join(SRC_ROOT, "api");
   for (const key of getSubfolders(apiSrc)) {
     console.log("### CDK:API", { key });
-    const lambda = new LambdaStack({
-      scope,
-      props,
-      id: `${APP}-api-${key}`,
+    const lambda = new LambdaStack(scope, `${APP}-api-${key}`, {
+      ...props,
       source: join(apiSrc, key),
       alias: STAGE,
       version: APP_VERSION,

@@ -14,10 +14,7 @@ import {
 } from "aws-cdk-lib/aws-lambda";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 
-interface IProps {
-  scope: Construct;
-  id: string;
-  props?: StackProps;
+interface IProps extends StackProps {
   source: string;
   alias?: string;
   version?: string;
@@ -28,16 +25,11 @@ export class LambdaStack extends Stack {
   private readonly source: string;
   private readonly version: string;
   private readonly alias: string;
-  constructor({
-    scope,
-    id,
-    props,
-    source,
-    version = "0.0.0",
-    alias = "dev",
-  }: IProps) {
+  constructor(scope: Construct, id: string, props: IProps) {
     super(scope, `${id}-lambda`, props);
+
     this.id = id;
+    const { source, version = "0.0.0", alias = "dev" } = props;
     this.source = source;
     this.version = version;
     this.alias = alias;
