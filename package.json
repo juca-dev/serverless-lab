@@ -6,7 +6,7 @@
     "url": "git+https://github.com/juca-dev/serverless-lab.git"
   },
   "scripts": {
-    "build": "tsc --build",
+    "build": "rm -rf dist && tsc --build",
     "dev": "tsx watch test/api.ts"
   },
   "author": "Juca Developer",
