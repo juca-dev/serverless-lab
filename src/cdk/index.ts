@@ -3,6 +3,7 @@ import { App, StackProps } from "aws-cdk-lib";
 import { join } from "path";
 import { getSubfolders } from "./util";
 import { LambdaStack } from "./lambda";
+import { ApiStack } from "./api";
 
 const { version: APP_VERSION } = require("../../package.json");
 const { AWS_ACCOUNT, AWS_REGION, APP, STAGE } = process.env;
@@ -40,6 +41,13 @@ async function main() {
       stage: STAGE,
       version: APP_VERSION,
     });
+
+    const api = new ApiStack(scope, `${APP}-api-${context}`, {
+      ...props,
+      source: join(apiSrc, context),
+      stage: STAGE,
+    });
+    api.addDependency(lambda);
   }
 }
 
