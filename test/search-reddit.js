@@ -24,11 +24,13 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { QUERIES } from "./queries.js"; // ensure module is loaded
 
 // -------------------- CONFIG --------------------
 const CLIENT_ID = process.env.REDDIT_CLIENT_ID;
 const CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET;
-const USER_AGENT = process.env.REDDIT_USER_AGENT || "reddit-harvester/1.0 (by unknown)";
+const USER_AGENT =
+  process.env.REDDIT_USER_AGENT || "reddit-harvester/1.0 (by unknown)";
 const USERNAME = process.env.REDDIT_USERNAME; // optional
 const PASSWORD = process.env.REDDIT_PASSWORD; // optional
 
@@ -45,47 +47,66 @@ const DAYS = 90;
 const WINDOW_START_UTC = Math.floor((NOW - DAYS * 24 * 60 * 60 * 1000) / 1000);
 
 // Engagement thresholds for comments
-const MIN_SCORE = 2;     // upvotes score
-const MIN_LENGTH = 80;   // characters
+const MIN_SCORE = 2; // upvotes score
+const MIN_LENGTH = 80; // characters
 const MAX_COMMENTS_TOTAL = 1200; // safety cap
 const MAX_POSTS_PER_QUERY = 120; // limit posts scanned per query
-const COMMENTS_PER_POST = 100;   // fetch up to 100 (top) per post
+const COMMENTS_PER_POST = 100; // fetch up to 100 (top) per post
 
 // Heuristic: Brazilian Portuguese (language + geo-ish keywords)
 const PT_COMMON = [
-  " de ", " que ", " não ", " nao ", " para ", " você ", " voce ", " com ", " está ", " esta ",
-  " sobre ", " pelo ", " pela ", " entre ", " então ", " entao ", " pois ", " pra ", " gente "
+  " de ",
+  " que ",
+  " não ",
+  " nao ",
+  " para ",
+  " você ",
+  " voce ",
+  " com ",
+  " está ",
+  " esta ",
+  " sobre ",
+  " pelo ",
+  " pela ",
+  " entre ",
+  " então ",
+  " entao ",
+  " pois ",
+  " pra ",
+  " gente ",
 ];
 const PT_ACCENTS = /[áàâãéêíóôõúç]/i;
 
 const BRAZIL_HINTS = [
-  "brasil", "brazil", "curitiba", "são paulo", "sao paulo", "rio de janeiro", "porto alegre",
-  "minas", "bahia", "recife", "fortaleza", "manaus", "brasileiro", "brasileira", "paraná", "parana"
+  "brasil",
+  "brazil",
+  "curitiba",
+  "são paulo",
+  "sao paulo",
+  "rio de janeiro",
+  "porto alegre",
+  "minas",
+  "bahia",
+  "recife",
+  "fortaleza",
+  "manaus",
+  "brasileiro",
+  "brasileira",
+  "paraná",
+  "parana",
 ];
 
 // Preferred subreddits (optional; still searches globally)
 const SUBREDDITS_HINT = [
-  "brasil", "programacao", "brdev", "empreendedor", "empreendedorismo", "startups",
-  "saas", "fintech", "desenvolvimentoweb"
-];
-
-// Domain-specific queries (similar to your X set; no need to over-encode)
-const QUERIES = [
-  // Scalability / MVP bottlenecks
-  '("MVP" OR "produto") ("não escala" OR "nao escala" OR trava OR "cai com")',
-  '("escalar software" OR escalabilidade OR "pico de tráfego" OR "pico de trafego")',
-  '("dívida técnica" OR "divida tecnica" OR refatoração OR refatoracao OR legado) (startup OR PME)',
-  // Cost / cloud / FinOps
-  '("fatura" OR "custo") (nuvem OR cloud OR AWS OR Azure OR GCP) (caro OR explodiu OR cortar)',
-  // Observability / prod
-  '("observabilidade" OR "sem logs" OR "sem métricas" OR "sem metricas") (prod OR produção OR producao)',
-  '("timeout" OR "erro 500" OR latência OR latencia) (cliente OR checkout OR vendas)',
-  // Architecture
-  '(monolito OR monolith) (migrar OR microserviços OR microservicos)',
-  // Process / CI/CD
-  '("deploy" OR "CI/CD") ("sem teste" OR quebrado OR "rollback")',
-  // Decision-makers
-  '(fundador OR cofundador OR CEO OR dono OR sócio OR socio) ("meu software" OR "nosso produto" OR "nossa plataforma")'
+  "brasil",
+  "programacao",
+  "brdev",
+  "empreendedor",
+  "empreendedorismo",
+  "startups",
+  "saas",
+  "fintech",
+  "desenvolvimentoweb",
 ];
 
 // -------------------- OAUTH --------------------
@@ -95,14 +116,14 @@ async function getAccessToken() {
   let res = await fetch("https://www.reddit.com/api/v1/access_token", {
     method: "POST",
     headers: {
-      "Authorization": `Basic ${basic}`,
+      Authorization: `Basic ${basic}`,
       "User-Agent": USER_AGENT,
-      "Content-Type": "application/x-www-form-urlencoded"
+      "Content-Type": "application/x-www-form-urlencoded",
     },
     body: new URLSearchParams({
       grant_type: "client_credentials",
-      duration: "temporary"
-    })
+      duration: "temporary",
+    }),
   });
 
   if (res.ok) {
@@ -115,15 +136,15 @@ async function getAccessToken() {
     res = await fetch("https://www.reddit.com/api/v1/access_token", {
       method: "POST",
       headers: {
-        "Authorization": `Basic ${basic}`,
+        Authorization: `Basic ${basic}`,
         "User-Agent": USER_AGENT,
-        "Content-Type": "application/x-www-form-urlencoded"
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
         grant_type: "password",
         username: USERNAME,
-        password: PASSWORD
-      })
+        password: PASSWORD,
+      }),
     });
     if (!res.ok) {
       const t = await res.text().catch(() => "");
@@ -142,16 +163,18 @@ async function redditFetch(url, token) {
   while (true) {
     const res = await fetch(url, {
       headers: {
-        "Authorization": `Bearer ${token}`,
-        "User-Agent": USER_AGENT
-      }
+        Authorization: `Bearer ${token}`,
+        "User-Agent": USER_AGENT,
+      },
     });
 
     const rlRemain = res.headers.get("x-ratelimit-remaining");
     const rlReset = res.headers.get("x-ratelimit-reset");
     const retryAfter = res.headers.get("retry-after");
     if (rlRemain || rlReset) {
-      console.warn(`[rate] remaining=${rlRemain ?? "-"} reset=${rlReset ?? "-"}`);
+      console.warn(
+        `[rate] remaining=${rlRemain ?? "-"} reset=${rlReset ?? "-"}`
+      );
     }
 
     if (res.status === 429) {
@@ -159,7 +182,7 @@ async function redditFetch(url, token) {
       if (retryAfter) waitSec = Number(retryAfter);
       else if (rlReset) waitSec = Math.ceil(Number(rlReset));
       console.warn(`[429] Waiting ${waitSec}s...`);
-      await new Promise(r => setTimeout(r, waitSec * 1000));
+      await new Promise((r) => setTimeout(r, waitSec * 1000));
       continue;
     }
 
@@ -186,7 +209,7 @@ async function* searchPosts(token, query) {
       limit: "100",
       type: "link,self", // posts
       include_over_18: "on", // include all to avoid filtering by nsfw
-      restrict_sr: "false"
+      restrict_sr: "false",
     });
     if (after) params.set("after", after);
 
@@ -213,7 +236,7 @@ async function* searchPosts(token, query) {
     after = j.data?.after || null;
     if (!after) return;
     // Friendly pacing
-    await new Promise(r => setTimeout(r, 400));
+    await new Promise((r) => setTimeout(r, 400));
   }
 }
 
@@ -226,9 +249,7 @@ async function fetchCommentsForPost(token, postId, limit = COMMENTS_PER_POST) {
   const arr = Array.isArray(j) ? j : [];
   if (arr.length < 2) return [];
   const comments = arr[1]?.data?.children || [];
-  return comments
-    .filter(c => c.kind === "t1" && c.data)
-    .map(c => c.data);
+  return comments.filter((c) => c.kind === "t1" && c.data).map((c) => c.data);
 }
 
 // -------------------- FILTERS --------------------
@@ -237,24 +258,30 @@ function isPortuguese(text) {
   const t = " " + text.toLowerCase() + " ";
   if (PT_ACCENTS.test(text)) return true;
   let hit = 0;
-  PT_COMMON.forEach(w => { if (t.includes(w)) hit++; });
+  PT_COMMON.forEach((w) => {
+    if (t.includes(w)) hit++;
+  });
   return hit >= 2;
 }
 
 function hintsBrazil(text) {
   if (!text) return false;
   const lc = text.toLowerCase();
-  return BRAZIL_HINTS.some(k => lc.includes(k));
+  return BRAZIL_HINTS.some((k) => lc.includes(k));
 }
 
 function looksBrazilianContext(post, comment) {
   // Heuristic: Portuguese + either Brazil hints in post title or comment,
   // or subreddit hint appears in subreddit display_name.
-  const sub = (post?.subreddit || post?.subreddit_name_prefixed || "").toLowerCase();
+  const sub = (
+    post?.subreddit ||
+    post?.subreddit_name_prefixed ||
+    ""
+  ).toLowerCase();
   const title = (post?.title || "").toLowerCase();
   const body = (comment?.body || "").toLowerCase();
 
-  const subHit = SUBREDDITS_HINT.some(s => sub.includes(s));
+  const subHit = SUBREDDITS_HINT.some((s) => sub.includes(s));
   const brHit = hintsBrazil(title) || hintsBrazil(body);
   return isPortuguese(body) && (subHit || brHit);
 }
@@ -270,7 +297,7 @@ function formatBlock(post, comment) {
     `comment_id: ${comment.id} | author: u/${comment.author} | score: ${score}`,
     `date: ${created}`,
     `url: ${perma}`,
-    "text:"
+    "text:",
   ].join("\n");
 
   // Preserve original text as-is.
@@ -298,7 +325,11 @@ function formatBlock(post, comment) {
     for await (const post of searchPosts(token, q)) {
       if (collected >= MAX_COMMENTS_TOTAL) break;
 
-      const comments = await fetchCommentsForPost(token, post.id, COMMENTS_PER_POST);
+      const comments = await fetchCommentsForPost(
+        token,
+        post.id,
+        COMMENTS_PER_POST
+      );
       for (const c of comments) {
         if (!c || seenComments.has(c.id)) continue;
         seenComments.add(c.id);
@@ -320,12 +351,14 @@ function formatBlock(post, comment) {
       }
 
       // Light pacing between posts
-      await new Promise(r => setTimeout(r, 300));
+      await new Promise((r) => setTimeout(r, 300));
     }
   }
 
-  console.log(`\nDone. Collected ${collected} comments. Saved to ${OUTPUT_FILE}`);
-})().catch(e => {
+  console.log(
+    `\nDone. Collected ${collected} comments. Saved to ${OUTPUT_FILE}`
+  );
+})().catch((e) => {
   console.error("Fatal:", e.message);
   process.exit(1);
 });
