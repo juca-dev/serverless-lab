@@ -11,7 +11,7 @@
   },
   "author": "Juca Developer",
   "license": "MIT",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/juca-dev/serverless-lab/issues"
   },
