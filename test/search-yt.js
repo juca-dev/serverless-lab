@@ -35,19 +35,35 @@ const QUERIES = [
   // '"site lento" OR "app lento" OR "queda de conversão" OR "queda de conversao" performance',
   // 'LGPD OR "segurança da informação" OR "seguranca da informacao" compliance'
 
-  // Info produtos
-  '"infoproduto" OR "curso online" OR "ebook" OR "mentoria digital" OR "lançamento digital"',
-  '"plataforma de cursos" OR "venda de curso" OR "hotmart" OR "kebook" OR "monetizze"',
+  // // Info produtos
+  // '"infoproduto" OR "curso online" OR "ebook" OR "mentoria digital" OR "lançamento digital"',
+  // '"plataforma de cursos" OR "venda de curso" OR "hotmart" OR "kebook" OR "monetizze"',
 
-  // Renda digital
-  '"renda digital" OR "ganhar dinheiro online" OR "renda extra com tecnologia"',
-  '"trabalho remoto" OR "trabalho online" OR "home office" oportunidades',
-  '"marketing digital" OR "funil de vendas" OR "anúncios online" OR "trafego pago"',
+  // // Renda digital
+  // '"renda digital" OR "ganhar dinheiro online" OR "renda extra com tecnologia"',
+  // '"trabalho remoto" OR "trabalho online" OR "home office" oportunidades',
+  // '"marketing digital" OR "funil de vendas" OR "anúncios online" OR "trafego pago"',
 
-  // Empreendedorismo
-  '"empreendedorismo digital" OR "startup" OR "criar negócio online" OR "negocio online"',
-  '"pequeno empresário" OR "microempreendedor" OR MEI tecnologia',
-  '"transformação digital" OR "automatizar processo" OR "escalar empresa"'
+  // // Empreendedorismo
+  // '"empreendedorismo digital" OR "startup" OR "criar negócio online" OR "negocio online"',
+  // '"pequeno empresário" OR "microempreendedor" OR MEI tecnologia',
+  // '"transformação digital" OR "automatizar processo" OR "escalar empresa"',
+
+  // Donos de empresas
+  '"dono de empresa" OR "proprietário de negócio" OR "pequeno empresário" OR "microempresário"',
+  '"gestão empresarial" OR "como gerir empresa" OR "problemas empresariais"',
+  '"minha empresa" OR "meu negócio" OR "crescer empresa"',
+
+  // C-levels
+  '"CEO" OR "CFO" OR "CTO" OR "CIO" OR "CMO" cargos',
+  '"alta gestão" OR "tomada de decisão" OR "executivo de tecnologia"',
+  '"estratégia corporativa" OR "governança" OR "decisão estratégica"',
+
+  // Capacitação de Tech Lead
+  '"tech lead" OR "engenheiro líder" OR "engenharia de software liderança"',
+  '"capacitação de tech lead" OR "formação de líderes de tecnologia"',
+  '"mentoria tech lead" OR "como ser um tech lead" OR "liderança técnica"',
+  '"soft skills liderança" OR "hard skills tech lead" OR "gestão de times de tecnologia"'
 ];
 
 // Region/language hints for search
