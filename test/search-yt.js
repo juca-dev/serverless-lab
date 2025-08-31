@@ -24,46 +24,24 @@ if (!API_KEY) {
 
 // ===== Your niche queries (Portuguese/Brazil) =====
 const QUERIES = [
-  // Slogan-aligned
-  // '"economizar com tecnologia" OR "reduzir custos com tecnologia"',
-  // '"escalar meu negócio" OR "escalar meu negocio" escalabilidade',
-  // 'FinOps OR "custo de nuvem" OR "conta da nuvem" OR "fatura AWS" OR "otimizar cloud"',
-  // '"gestão de TI" OR "gestao de TI" OR "gestão tecnológica" OR "gestao tecnologica" OR "tech lead"',
-  // '"dívida técnica" OR "divida tecnica" OR legado OR "refatorar" OR "microserviços" OR microservicos',
-  // '"observabilidade" OR "sem logs" OR "sem métricas" OR "sem metricas" OR "erro 500" OR timeout',
-  // '"minha empresa precisa" OR "meu negócio precisa" OR "meu negocio precisa" tecnologia',
-  // '"site lento" OR "app lento" OR "queda de conversão" OR "queda de conversao" performance',
-  // 'LGPD OR "segurança da informação" OR "seguranca da informacao" compliance'
+  // Gestão de TI (termos diretos)
+  '"gestão de TI" OR "gestao de TI" OR "gestão de tecnologia" OR "gestao tecnologica"',
+  '"gestão de infraestrutura" OR "gestao de infraestrutura" OR "administração de sistemas"',
+  '"gestão de times de TI" OR "gestao de equipes de tecnologia" OR "liderança em TI"',
 
-  // // Info produtos
-  // '"infoproduto" OR "curso online" OR "ebook" OR "mentoria digital" OR "lançamento digital"',
-  // '"plataforma de cursos" OR "venda de curso" OR "hotmart" OR "kebook" OR "monetizze"',
+  // Problemas e dores comuns
+  '"dificuldade em gestão de TI" OR "problemas na equipe de TI" OR "TI sem gestão"',
+  '"orçamento de TI" OR "custos de TI" OR "ROI de tecnologia"',
+  '"segurança da informação" OR "compliance TI" OR "LGPD TI"',
 
-  // // Renda digital
-  // '"renda digital" OR "ganhar dinheiro online" OR "renda extra com tecnologia"',
-  // '"trabalho remoto" OR "trabalho online" OR "home office" oportunidades',
-  // '"marketing digital" OR "funil de vendas" OR "anúncios online" OR "trafego pago"',
+  // Canais de capacitação e liderança
+  '"curso gestão de TI" OR "mentoria em TI" OR "formação líder de tecnologia"',
+  '"capacitação CIO" OR "capacitação CTO" OR "treinamento gestor de TI"',
+  '"tech lead gestão" OR "engenheiro líder gestão de times"',
 
-  // // Empreendedorismo
-  // '"empreendedorismo digital" OR "startup" OR "criar negócio online" OR "negocio online"',
-  // '"pequeno empresário" OR "microempreendedor" OR MEI tecnologia',
-  // '"transformação digital" OR "automatizar processo" OR "escalar empresa"',
-
-  // Donos de empresas
-  '"dono de empresa" OR "proprietário de negócio" OR "pequeno empresário" OR "microempresário"',
-  '"gestão empresarial" OR "como gerir empresa" OR "problemas empresariais"',
-  '"minha empresa" OR "meu negócio" OR "crescer empresa"',
-
-  // C-levels
-  '"CEO" OR "CFO" OR "CTO" OR "CIO" OR "CMO" cargos',
-  '"alta gestão" OR "tomada de decisão" OR "executivo de tecnologia"',
-  '"estratégia corporativa" OR "governança" OR "decisão estratégica"',
-
-  // Capacitação de Tech Lead
-  '"tech lead" OR "engenheiro líder" OR "engenharia de software liderança"',
-  '"capacitação de tech lead" OR "formação de líderes de tecnologia"',
-  '"mentoria tech lead" OR "como ser um tech lead" OR "liderança técnica"',
-  '"soft skills liderança" OR "hard skills tech lead" OR "gestão de times de tecnologia"'
+  // Estratégia e inovação
+  '"transformação digital" OR "estratégia de TI" OR "planejamento de TI"',
+  '"governança de TI" OR "frameworks ITIL" OR "COBIT" OR "DevOps gestão"'
 ];
 
 // Region/language hints for search
