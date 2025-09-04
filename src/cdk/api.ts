@@ -19,6 +19,7 @@ export class ApiStack extends Stack {
   private readonly id: string;
   private readonly source: string;
   private readonly stage: string;
+  public readonly httpApi: HttpApi;
   constructor(scope: Construct, id: string, props: Props) {
     super(scope, `${id}-apigw`, props);
     this.id = id;
@@ -44,6 +45,7 @@ export class ApiStack extends Stack {
         allowMethods: [...methods, CorsHttpMethod.OPTIONS],
       },
     });
+    this.httpApi = httpApi;
 
     routes.forEach((route, i) => {
       const paths = route.split("-").filter((e) => e !== "index"); //remove index to be the root
