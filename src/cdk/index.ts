@@ -4,9 +4,10 @@ import { join } from "path";
 import { getSubfolders } from "./util";
 import { LambdaStack } from "./lambda";
 import { ApiStack } from "./api";
+import { DomainStack } from "./domain";
 
 const { version: APP_VERSION } = require("../../package.json");
-const { AWS_ACCOUNT, AWS_REGION, APP, STAGE } = process.env;
+const { AWS_ACCOUNT, AWS_REGION, APP, STAGE, DOMAIN } = process.env;
 
 const SRC_ROOT = join(__dirname, "../..", "dist");
 
@@ -17,6 +18,7 @@ async function main() {
     AWS_ACCOUNT,
     AWS_REGION,
     STAGE,
+    DOMAIN,
   });
 
   const scope = new App({});
@@ -49,6 +51,12 @@ async function main() {
     });
     api.addDependency(lambda);
   }
+
+  const domain = new DomainStack(scope, `${APP}`, {
+    ...props,
+    domain: DOMAIN,
+    hostedZoneId: await DomainStack.getId(DOMAIN),
+  });
 }
 
 main();
