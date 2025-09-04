@@ -4,3 +4,4 @@
 /dist
 /tsconfig.tsbuildinfo
 /cdk.out
+cdk.context.json

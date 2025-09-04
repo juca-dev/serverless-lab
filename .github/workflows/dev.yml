@@ -17,6 +17,8 @@ env:
   # APP
   APP: slab
   STAGE: dev
+  DOMAIN: juca.online
+  API_DOMAIN: dev-api.juca.online
 
 jobs:
   build:
