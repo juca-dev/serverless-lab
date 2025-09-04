@@ -7,6 +7,7 @@ import { ApiStack } from "./api";
 import { DomainStack } from "./domain";
 import { CertificateStack } from "./certificate";
 import { ApiDomainStack } from "./apiDomain";
+import { HttpApi } from "aws-cdk-lib/aws-apigatewayv2";
 
 const { version: APP_VERSION } = require("../../package.json");
 const { AWS_ACCOUNT, AWS_REGION, APP, STAGE, DOMAIN, API_DOMAIN } = process.env;
@@ -38,7 +39,7 @@ async function main() {
   };
 
   const apiSrc = join(SRC_ROOT, "api");
-  const apis = [];
+  const apis: Record<string, HttpApi> = {};
   for (const context of getSubfolders(apiSrc)) {
     console.log("CDK:API", { context });
     const lambda = new LambdaStack(scope, `${APP}-api-${context}`, {
@@ -54,7 +55,7 @@ async function main() {
       stage: STAGE,
     });
     api.addDependency(lambda);
-    apis.push(api.httpApi);
+    apis[context] = api.httpApi;
   }
 
   const hasDomain = DOMAIN && DOMAIN.length > 0; // TODO: check if exists, CDK does not support conditionals
@@ -63,6 +64,7 @@ async function main() {
     const domain = new DomainStack(scope, `${APP}`, {
       ...props,
       domain: DOMAIN,
+      hostedZoneId: await DomainStack.getId(DOMAIN),
     });
     const cert = new CertificateStack(scope, `${APP}`, {
       ...props,

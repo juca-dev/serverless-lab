@@ -14,7 +14,7 @@ import { Construct } from "constructs";
 interface Props extends StackProps {
   domain: string;
   stage: string;
-  httpApis: HttpApi[];
+  httpApis: Record<string, HttpApi>;
 }
 
 export class ApiDomainStack extends Stack {
@@ -43,15 +43,19 @@ export class ApiDomainStack extends Stack {
       certificate: cert,
     });
 
-    httpApis.forEach((e) => {
-      new ApiMapping(this, `path-${e.httpApiName}`, {
-        apiMappingKey: e.httpApiName!.replace(`${id}-api-`, ""), // TODO: managed by api name
+    Object.keys(httpApis).forEach((key) => {
+      new ApiMapping(this, `path-${key}`, {
+        apiMappingKey: key,
         domainName,
-        api: e,
-        stage: HttpStage.fromHttpStageAttributes(this, `stage-${e.httpApiName}`, {
-          api: e,
-          stageName: stage,
-        }),
+        api: httpApis[key],
+        stage: HttpStage.fromHttpStageAttributes(
+          this,
+          `stage-${key}`,
+          {
+            api: httpApis[key],
+            stageName: stage,
+          }
+        ),
       });
     });
 

@@ -1,0 +1,31 @@
+# Step 03 - Serverless Custom Domain
+
+## Instructions
+- Create `DOMAIN` environment
+    - Create `src/cdk/domain.ts`
+    - Explain checked domain should be validated before
+        - install module `npm i -D @aws-sdk/client-route-53`
+        - Explain the resource should have same name
+    - Integrate to `src/cdk/index.ts`
+    - Build app
+    - Deploy cdk `cdk deploy "*" --profile sandbox` (set .env AWS_PROFILE)
+    - Show resource
+    - Update DNS on server registration
+    - Check propagation [link](https://dnschecker.org/)
+- Create `src/cdk/certificate.ts` (*.{DOMAIN})
+    - Explain that is important create one by project (check on tags)
+    - Integrate to `src/cdk/index.ts`
+    - Build app
+    - Wait DNS propagation [link](https://dnschecker.org/)
+    - Deploy cdk `cdk deploy "*" --profile sandbox`
+    - Show resource, status="issued" (approved)
+- Create `API_DOMAIN` environment
+    - Create `src/cdk/apiDomain.ts`
+    - Integrate to `src/cdk/index.ts`
+        - Create `const httpApis: Record<string, HttpApi> = {}`
+    - Build app
+    - Deploy cdk `cdk deploy "*" --profile sandbox`
+    - Show resource
+- Update ci/cd
+    - set env
+    - commit

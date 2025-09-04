@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/juca-dev/serverless-lab#readme",
   "devDependencies": {
+    "@aws-sdk/client-route-53": "^3.881.0",
     "@types/node": "^24.3.0",
     "dotenv": "^17.2.1",
     "fastify": "^5.5.0",
