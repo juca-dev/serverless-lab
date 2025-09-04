@@ -5,6 +5,7 @@ import { getSubfolders } from "./util";
 import { LambdaStack } from "./lambda";
 import { ApiStack } from "./api";
 import { DomainStack } from "./domain";
+import { CertificateStack } from "./certificate";
 
 const { version: APP_VERSION } = require("../../package.json");
 const { AWS_ACCOUNT, AWS_REGION, APP, STAGE, DOMAIN } = process.env;
@@ -57,6 +58,12 @@ async function main() {
     domain: DOMAIN,
     hostedZoneId: await DomainStack.getId(DOMAIN),
   });
+
+  const cert = new CertificateStack(scope, `${APP}`, {
+    ...props,
+    domain: DOMAIN,
+  });
+  cert.addDependency(domain);
 }
 
 main();
