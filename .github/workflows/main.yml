@@ -17,6 +17,8 @@ env:
   # APP
   APP: slab
   STAGE: live
+  DOMAIN: ${{ vars.DOMAIN }}
+  API_DOMAIN: ${{ vars.API_DOMAIN }}
 
 jobs:
   build:
