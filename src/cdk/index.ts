@@ -4,9 +4,12 @@ import { join } from "path";
 import { getSubfolders } from "./util";
 import { LambdaStack } from "./lambda";
 import { ApiStack } from "./api";
+import { DomainStack } from "./domain";
+import { CertificateStack } from "./certificate";
+import { ApiDomainStack } from "./apiDomain";
 
 const { version: APP_VERSION } = require("../../package.json");
-const { AWS_ACCOUNT, AWS_REGION, APP, STAGE } = process.env;
+const { AWS_ACCOUNT, AWS_REGION, APP, STAGE, DOMAIN, API_DOMAIN } = process.env;
 
 const SRC_ROOT = join(__dirname, "../..", "dist");
 
@@ -17,6 +20,8 @@ async function main() {
     AWS_ACCOUNT,
     AWS_REGION,
     STAGE,
+    DOMAIN,
+    API_DOMAIN,
   });
 
   const scope = new App({});
@@ -33,6 +38,7 @@ async function main() {
   };
 
   const apiSrc = join(SRC_ROOT, "api");
+  const apis = [];
   for (const context of getSubfolders(apiSrc)) {
     console.log("CDK:API", { context });
     const lambda = new LambdaStack(scope, `${APP}-api-${context}`, {
@@ -48,6 +54,30 @@ async function main() {
       stage: STAGE,
     });
     api.addDependency(lambda);
+    apis.push(api.httpApi);
+  }
+
+  const hasDomain = DOMAIN && DOMAIN.length > 0; // TODO: check if exists, CDK does not support conditionals
+
+  if (hasDomain) {
+    const domain = new DomainStack(scope, `${APP}`, {
+      ...props,
+      domain: DOMAIN,
+    });
+    const cert = new CertificateStack(scope, `${APP}`, {
+      ...props,
+      domain: DOMAIN,
+    });
+    cert.addDependency(domain);
+  }
+
+  if (API_DOMAIN) {
+    new ApiDomainStack(scope, `${APP}`, {
+      ...props,
+      domain: API_DOMAIN,
+      stage: STAGE,
+      httpApis: apis,
+    });
   }
 }
 
